@@ -12,8 +12,7 @@ export const setCount = (count, setQrvalue) => {
       type: "execute_contract",
       transaction: {
         to: COUNT_CONTRACT_ADDRESS,
-        abi:
-          '{ "constant": false, "inputs": [ { "name": "_count", "type": "uint256" } ], "name": "setCount", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }',
+        abi: '{ "constant": false, "inputs": [ { "name": "_count", "type": "uint256" } ], "name": "setCount", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }',
         value: "0",
         params: `[\"${count}\"]`,
       },
@@ -30,7 +29,9 @@ export const setCount = (count, setQrvalue) => {
           .then((res) => {
             if (res.data.result) {
               console.log(`[Result] ${JSON.stringify(res.data.result)}`);
-              clearInterval(timerId);
+              if (res.data.result.status === "success") {
+                clearInterval(timerId);
+              }
             }
           });
       }, 1000);

@@ -171,7 +171,7 @@ function App() {
         {tab === "MARKET" || tab === "WALLET" ? (
           <div className="container" style={{ padding: 0, width: "100%" }}>
             {rows.map((o, rowIndex) => (
-              <Row>
+              <Row key={`rowkey${rowIndex}`}>
                 <Col style={{ marginRight: 0, paddingRight: 0 }}>
                   <Card
                     onClick={() => {

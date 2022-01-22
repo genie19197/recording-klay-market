@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faWallet, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getBalance, readCount, setCount, fetchCardsOf } from "./api/UseCaver";
 import * as KlipAPI from "./api/UseKlip";
+import * as KasAPI from "./api/UseKAS";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "./market.css";
@@ -38,6 +39,8 @@ function App() {
   const [qrvalue, setQrvalue] = useState(DEFAULT_QR_CODE);
   const [tab, setTab] = useState("MARKET"); // MARKET, MINT, WALLET
   const [mintImageUrl, setMintImageUrl] = useState("");
+  const [mintTokenID, setMintTokenID] = useState("");
+
   // Modal
 
   const [showModal, setShowModal] = useState(false);
@@ -60,16 +63,24 @@ function App() {
     setNfts(_nfts);
   };
 
-  const onClickMint = async (uri) => {
+  const onClickMint = async (uri, tokenID) => {
     if (myAddress === DEFAULT_ADDRESS) {
       alert("NO ADDRESS");
       return;
     }
-    const randomTokenId = parseInt(Math.random() * 10000000);
+    // (option) asset upload api 이용
+    // metadata upload
+    const metadataURL = await KasAPI.uploadMetaData(uri);
+    if (!metadataURL) {
+      alert("메타 데이터 업로드에 실패하였습니다.");
+      return;
+    }
+    // const randomTokenId = parseInt(Math.random() * 10000000);
+
     KlipAPI.mintCardWithURI(
       myAddress,
-      randomTokenId,
-      uri,
+      tokenID,
+      metadataURL,
       setQrvalue,
       (result) => {
         alert(JSON.stringify(result));
@@ -222,11 +233,21 @@ function App() {
                       type="text"
                       placeholder="이미지 주소를 입력해주세요"
                     />
+                    <br />
+                    <Form.Control
+                      value={mintTokenID}
+                      onChange={(e) => {
+                        console.log(e.target.value);
+                        setMintTokenID(e.target.value);
+                      }}
+                      type="text"
+                      placeholder="토큰 ID를 입력해주세요"
+                    />
                   </Form.Group>
                   <br />
                   <Button
                     onClick={() => {
-                      onClickMint(mintImageUrl);
+                      onClickMint(mintImageUrl, mintTokenID);
                     }}
                     variant="primary"
                     style={{
